@@ -1,0 +1,51 @@
+day 1
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Metadata Stripper</title>
+</head>
+<body>
+    <h1>🔒 Metadata Stripper</h1>
+
+    <div id="d">
+        Click to select image
+        <input type="file" id="f" accept="image/*"/>
+    </div>
+
+    <button id="b" disabled>Download Clean</button>
+    <canvas id="c"></canvas>
+
+    <script>
+        const d = document.getElementById('d');
+        const f = document.getElementById('f');
+        const c = document.getElementById('c');
+        const x = c.getContext('2d');
+        const b = document.getElementById('b');
+
+        let file;
+
+        d.onclick = () => f.click();
+
+        f.onchange = async e => {
+            file = e.target.files[0];
+            const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+            c.width = bmp.width;
+            c.height = bmp.height;
+            x.drawImage(bmp, 0, 0);
+            c.style.display = 'block';
+            b.disabled = false;
+        };
+
+        b.onclick = () => {
+            c.toBlob(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = file.name.replace(/\.[^.]+$/, '') + '-clean.png';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }, 'image/png');
+        };
+    </script>
+</body>
+</html>   
