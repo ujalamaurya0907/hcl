@@ -1,20 +1,197 @@
-day 1
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8"/>
-    <title>Metadata Stripper</title>
+    <title>Image Metadata Stripper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: rgb(15, 20, 32);
+            color: rgb(226, 232, 240);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4rem 1.5rem;
+        }
+
+        h1 {
+            position: relative;
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 2.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: rgb(241, 245, 249);
+            margin-bottom: 2.35rem;
+            padding-bottom: 0.65rem;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
+        }
+
+        h1 span {
+            font-style: italic;
+            color: rgb(125, 211, 252);
+        }
+
+        h1::after {
+            content: "";
+            display: block;
+            width: 72px;
+            height: 3px;
+            margin: 0.65rem auto 0;
+            border-radius: 999px;
+            background-color: rgb(56, 189, 248);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 560px;
+            background-color: rgb(19, 24, 36);
+            border: 1px solid rgb(45, 58, 84);
+            border-radius: 18px;
+            padding: 1.5rem;
+            box-shadow:
+                0 1px 0 rgba(125, 211, 252, 0.14) inset,
+                0 18px 45px rgba(0, 0, 0, 0.6),
+                0 0 28px rgba(79, 70, 229, 0.14);
+        }
+
+        #d {
+            position: relative;
+            border: 1.5px dashed rgb(56, 189, 248);
+            border-radius: 13px;
+            padding: 2.75rem 1.5rem 3.25rem;
+            cursor: pointer;
+            transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
+            text-align: center;
+            background-color: rgb(13, 18, 28);
+            box-shadow:
+                inset 0 2px 12px rgba(0, 0, 0, 0.4),
+                0 0 18px rgba(14, 165, 233, 0.08);
+        }
+
+        #d:hover,
+        #d.drag {
+            border-color: rgb(52, 211, 153);
+            background-color: rgb(16, 27, 34);
+            box-shadow:
+                inset 0 2px 12px rgba(0, 0, 0, 0.25),
+                0 0 0 3px rgba(52, 211, 153, 0.18),
+                0 0 24px rgba(16, 185, 129, 0.18);
+        }
+
+        #d:active {
+            transform: scale(0.992);
+        }
+
+        #d .icon {
+            font-size: 2.1rem;
+            display: block;
+            margin-bottom: 0.75rem;
+            filter: drop-shadow(0 4px 12px rgba(56, 189, 248, 0.35));
+        }
+
+        #d p {
+            font-family: 'JetBrains Mono', monospace;
+            color: rgb(165, 180, 252);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        #d::after {
+            content: "EXIF & GPS STRIPPED LOCALLY";
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.28rem 0.65rem;
+            border-radius: 999px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: rgb(110, 231, 183);
+            background-color: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.35);
+        }
+
+        input {
+            display: none;
+        }
+
+        button {
+            width: 100%;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background-color: rgb(16, 185, 129);
+            color: rgb(6, 24, 19);
+            border: 1px solid rgb(110, 231, 183);
+            padding: 0.85rem 1.25rem;
+            border-radius: 11px;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            box-shadow:
+                0 1px 0 rgba(255, 255, 255, 0.28) inset,
+                0 8px 22px rgba(16, 185, 129, 0.32);
+            transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease, opacity 0.15s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: rgb(52, 211, 153);
+            border-color: rgb(167, 243, 208);
+            box-shadow:
+                0 1px 0 rgba(255, 255, 255, 0.35) inset,
+                0 10px 26px rgba(52, 211, 153, 0.42);
+            transform: translateY(-1px);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: rgb(30, 36, 52);
+            border-color: rgb(51, 62, 88);
+            color: rgb(129, 140, 173);
+            box-shadow: none;
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin-top: 1.25rem;
+            display: none;
+            border: 1px solid rgb(56, 189, 248);
+            box-shadow:
+                0 14px 32px rgba(0, 0, 0, 0.55),
+                0 0 20px rgba(56, 189, 248, 0.15);
+        }
+    </style>
 </head>
 <body>
-    <h1>🔒 Metadata Stripper</h1>
+    <h1>🔒 Image <span>Metadata</span> Stripper</h1>
 
-    <div id="d">
-        Click to select image
-        <input type="file" id="f" accept="image/*"/>
+    <div class="container">
+        <div id="d">
+            <span class="icon">📷</span>
+            <p>Click or drag &amp; drop an image</p>
+            <input type="file" id="f" accept="image/*"/>
+        </div>
+
+        <button id="b" disabled>Download Clean</button>
+        <canvas id="c"></canvas>
     </div>
-
-    <button id="b" disabled>Download Clean</button>
-    <canvas id="c"></canvas>
 
     <script>
         const d = document.getElementById('d');
@@ -27,25 +204,37 @@ day 1
 
         d.onclick = () => f.click();
 
-        f.onchange = async e => {
-            file = e.target.files[0];
+        f.onchange = e => {
+            if (e.target.files[0]) load(e.target.files[0]);
+        };
+
+        ['dragover', 'dragleave', 'drop'].forEach(evt => {
+            d.addEventListener(evt, e => {
+                e.preventDefault();
+                d.classList.toggle('drag', evt === 'dragover');
+                if (evt === 'drop' && e.dataTransfer.files[0]) {
+                    load(e.dataTransfer.files[0]);
+                }
+            });
+        });
+
+        async function load(file) {
             const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
             c.width = bmp.width;
             c.height = bmp.height;
             x.drawImage(bmp, 0, 0);
             c.style.display = 'block';
             b.disabled = false;
-        };
-
-        b.onclick = () => {
-            c.toBlob(blob => {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = file.name.replace(/\.[^.]+$/, '') + '-clean.png';
-                a.click();
-                URL.revokeObjectURL(a.href);
-            }, 'image/png');
-        };
+            b.onclick = () => {
+                c.toBlob(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = file.name.replace(/\.[^.]+$/, '') + '-clean.png';
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                }, 'image/png');
+            };
+        }
     </script>
 </body>
-</html>   
+</html>
